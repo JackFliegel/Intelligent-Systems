@@ -1,0 +1,3 @@
+Matlab code can be compiled using Matlab 2019 or later. Modifying the a, b, c, and d variables will change the behavior of the neuron and is used to change what kind of neuron is being simulated. The variable I can be modified to adjust the input current. R value is outputed to the command window not the graph
+
+Python code can run with python version 3.11.1 or later. Running the file will produce a chart that simulates a RS neuron.
