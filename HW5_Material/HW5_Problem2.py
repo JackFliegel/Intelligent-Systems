@@ -36,19 +36,19 @@ class SOFM:
 
     def __init__(self, input_size, grid_size):
         self.grid_size = grid_size
-        self.weights = np.random.random((grid_size * grid_size, input_size))
+        self.weights = np.random.random((grid_size * grid_size, input_size)) # random generated weights for SOFM    
 
     def winner(self, input_vector):
         # Finds the neuron (weight vector) closest to the input vector.
         distances = self.distance(self.weights, input_vector)
         return np.argmin(distances) # Indexes of min values along axis
 
-    def update_weights(self, winner_idx, input_vector, learning_rate, sigma):
-        winner_x, winner_y = divmod(winner_idx, self.grid_size)
+    def update_weights(self, winner_index, input_vector, learning_rate, sigma):
+        X_winner, Y_winner = divmod(winner_index, self.grid_size)
         for x in range(self.grid_size):
             for y in range(self.grid_size):
                 idx = x * self.grid_size + y
-                distance = (winner_x - x) ** 2 + (winner_y - y) ** 2
+                distance = (X_winner - x) ** 2 + (Y_winner - y) ** 2
                 influence = np.exp(-distance / (2 * (sigma ** 2)))
                 self.weights[idx] += learning_rate * influence * (input_vector - self.weights[idx])
 
@@ -62,24 +62,24 @@ def train_sofm(sofm, data, learning_rate=0.3, sigma=1.0, epochs=5):
         os.system('cls')
         print(f'Epoch {epoch+1}/{epochs}')
         for input_vector in data:
-            winner_idx = sofm.winner(input_vector) #  finds the winner neuron for each input
-            sofm.update_weights(winner_idx, input_vector, learning_rate, sigma) # updates the weights accordingly
+            winner_index = sofm.winner(input_vector) #  finds the winner neuron for each input
+            sofm.update_weights(winner_index, input_vector, learning_rate, sigma) # updates the weights accordingly
 
 def test_sofm(sofm, data, labels):
     # Tests SOFM using test data and corresponding labels
     activity_matrix = np.zeros((10, sofm.grid_size, sofm.grid_size))
     for input_vector, label in zip(data, labels):
-        winner_idx = sofm.winner(input_vector)
-        winner_x, winner_y = divmod(winner_idx, sofm.grid_size)
-        activity_matrix[label][winner_x][winner_y] += 1
+        winner_index = sofm.winner(input_vector)
+        X_winner, Y_winner = divmod(winner_index, sofm.grid_size)
+        activity_matrix[label][X_winner][Y_winner] += 1
     return activity_matrix / 100  # Normalize by number of data points per class
 
 def plot_heatmaps(activity_matrices):
-    fig, axes = plt.subplots(2, 5, figsize=(15, 6))
-    for i, ax in enumerate(axes.flatten()):
-        heatmap = ax.imshow(activity_matrices[i], cmap='afmhot', interpolation='nearest')
-        ax.set_title(f'Class {i}')
-        fig.colorbar(heatmap, ax=ax)
+    fig, subplots = plt.subplots(2, 5, figsize=(15, 6))
+    for i, subplot in enumerate(subplots.flatten()):
+        heatmap = subplot.imshow(activity_matrices[i], cmap='afmhot', interpolation='nearest')
+        subplot.set_title(f'Class {i}')
+        fig.colorbar(heatmap, ax=subplot)
     plt.show()
 
 def create_image(weights):
