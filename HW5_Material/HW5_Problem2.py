@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import random
 # from itertools import count
@@ -55,9 +56,10 @@ class SOFM:
         # Calculates the Euclidean distance between a matrix of vectors and a single vector
         return np.sqrt(np.sum((matrix - vector) ** 2, axis=1))
 
-def train_sofm(sofm, data, learning_rate=0.3, sigma=1.0, epochs=2):
+def train_sofm(sofm, data, learning_rate=0.3, sigma=1.0, epochs=5):
     # Trains the SOFM on the provided data for a given number of epochs
     for epoch in range(epochs):
+        os.system('cls')
         print(f'Epoch {epoch+1}/{epochs}')
         for input_vector in data:
             winner_idx = sofm.winner(input_vector) #  finds the winner neuron for each input

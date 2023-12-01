@@ -120,5 +120,11 @@ def runNetwork(weights):
     
     train_accuracies_caseI, val_accuracies_caseI, train_errors_caseI, val_errors_caseI = train(layer1Case1, activation1Case1, layer2Case1, activation2Case1, isTrainInputs=False)
 
-    # Plot Confusion Matricies
-    plot_confusion_matrix(plot_confusion_matrix(compute_confusion_matrix(trainingSetTargets, calculate_predictions(activation2Case1.output)), title='Training Set Case I'))
+    # plot confusion matrix
+    # Forward pass testSet
+    layer1Case1.forward(np.array(testSetPixels))
+    activation1Case1.forward(layer1Case1.output)
+    layer2Case1.forward(activation1Case1.output)
+    activation2Case1.forward(layer2Case1.output)
+    plot_confusion_matrix(compute_confusion_matrix(testSetTargets, calculate_predictions(activation2Case1.output)), title='Test Set Case I')
+    
