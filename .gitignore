@@ -6,3 +6,5 @@ HW5_Material/__pycache__/HW5_Problem3.cpython-311.pyc
 HW5_Material/__pycache__/HW5_Problem1.cpython-311.pyc
 HW5_Material/__pycache__/HW5_Problem2.cpython-311.pyc
 HW4_Material/__pycache__/feedForward.cpython-311.pyc
+HW5_Material/HW5_datafiles/sofm_weights.txt
+HW5_Material/HW5_datafiles/trainingSet.txt
