@@ -62,9 +62,7 @@ class Autoencoder:
         self.dinput_prev_weights = self.beta * self.dinput_prev_weights + (1 - self.beta) * dprev_weights
         self.dinput_prev_biases = self.beta * self.dinput_prev_biases + (1 - self.beta) * dprev_biases
         
-        # Update weights
-        self.weights -= self.learning_rate * self.dinput_weights
-        self.biases -= self.learning_rate * self.dinput_biases
+        # Update weightss
         self.prev_weights -= self.learning_rate * self.dinput_prev_weights
         self.prev_biases -= self.learning_rate * self.dinput_prev_biases
     
@@ -117,6 +115,12 @@ def plot_features(weights, neuron_index, subplot_index):
     plt.imshow(neuron_image, cmap='gray')
     plt.title(f'Neuron #{neuron_index}')
     plt.colorbar(label='Weight Intensity')
+
+def save_weights_to_file(weights, file_name):
+    with open(file_name, 'w') as file:
+        for row in weights:
+            line = ' '.join(map(str, row))
+            file.write(line + '\n')
 
 def runAutoencoder():
     labels = read_Labels()
@@ -172,3 +176,6 @@ def runAutoencoder():
     plt.tight_layout()
     plt.show()
 
+    save_weights_to_file(autoencoder.weights, 'pretrained_weights.txt')
+
+runAutoencoder()

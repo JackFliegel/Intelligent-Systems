@@ -1,4 +1,5 @@
 import numpy as np
+import random
 # from itertools import count
 import matplotlib.pyplot as plt
 
@@ -23,14 +24,23 @@ def writeSet(data, str):
         for item in data:
             file.write(f'{item}\n')
 
+def save_weights_to_file(weights, file_name):
+    with open(file_name, 'w') as file:
+        for row in weights:
+            line = ' '.join(map(str, row))
+            file.write(line + '\n')
+
 class SOFM:
+    # This class defines a self organizing feature map
+
     def __init__(self, input_size, grid_size):
         self.grid_size = grid_size
         self.weights = np.random.random((grid_size * grid_size, input_size))
 
-    def find_winner(self, input_vector):
+    def winner(self, input_vector):
+        # Finds the neuron (weight vector) closest to the input vector.
         distances = self.distance(self.weights, input_vector)
-        return np.argmin(distances)
+        return np.argmin(distances) # Indexes of min values along axis
 
     def update_weights(self, winner_idx, input_vector, learning_rate, sigma):
         winner_x, winner_y = divmod(winner_idx, self.grid_size)
@@ -45,20 +55,22 @@ class SOFM:
         # Calculates the Euclidean distance between a matrix of vectors and a single vector
         return np.sqrt(np.sum((matrix - vector) ** 2, axis=1))
 
-def train_sofm(sofm, data, learning_rate=0.75, sigma=1.0, epochs=5):
+def train_sofm(sofm, data, learning_rate=0.3, sigma=1.0, epochs=2):
+    # Trains the SOFM on the provided data for a given number of epochs
     for epoch in range(epochs):
-        print(epoch)
+        print(f'Epoch {epoch+1}/{epochs}')
         for input_vector in data:
-            winner_idx = sofm.find_winner(input_vector)
-            sofm.update_weights(winner_idx, input_vector, learning_rate, sigma)
+            winner_idx = sofm.winner(input_vector) #  finds the winner neuron for each input
+            sofm.update_weights(winner_idx, input_vector, learning_rate, sigma) # updates the weights accordingly
 
 def test_sofm(sofm, data, labels):
+    # Tests SOFM using test data and corresponding labels
     activity_matrix = np.zeros((10, sofm.grid_size, sofm.grid_size))
     for input_vector, label in zip(data, labels):
-        winner_idx = sofm.find_winner(input_vector)
+        winner_idx = sofm.winner(input_vector)
         winner_x, winner_y = divmod(winner_idx, sofm.grid_size)
         activity_matrix[label][winner_x][winner_y] += 1
-    return activity_matrix / 100  # Normalize by the number of data points per class
+    return activity_matrix / 100  # Normalize by number of data points per class
 
 def plot_heatmaps(activity_matrices):
     fig, axes = plt.subplots(2, 5, figsize=(15, 6))
@@ -68,15 +80,13 @@ def plot_heatmaps(activity_matrices):
         fig.colorbar(heatmap, ax=ax)
     plt.show()
 
-def weights_to_image(weights):
+def create_image(weights):
+    # Array -> image shape
     return weights.reshape(28, 28)
 
-def plot_weight_grid(sofm):
-    """
-    Plots a 12x12 grid of images representing the weights of each neuron in the SOFM.
-    
-    :param sofm: The trained SOFM object.
-    """
+def plot_weight_grids(sofm):
+    # Plots a 12x12 grid of images representing the weights of each neuron in the SOFM.
+
     grid_size = sofm.grid_size
     fig, axes = plt.subplots(grid_size, grid_size, figsize=(12, 12))
 
@@ -84,7 +94,7 @@ def plot_weight_grid(sofm):
         for j in range(grid_size):
             neuron_index = i * grid_size + j
             neuron_weights = sofm.weights[neuron_index]
-            image = weights_to_image(neuron_weights)
+            image = create_image(neuron_weights)
 
             ax = axes[i, j]
             ax.imshow(image, cmap='gray')
@@ -92,8 +102,6 @@ def plot_weight_grid(sofm):
 
     plt.show()
 
-   
-    
 def runNetwork():
     data = read_Labels()
     pixels = read_Pixels()
@@ -110,6 +118,7 @@ def runNetwork():
         testSetTargets.extend(pair[1] for pair in data[i:i+100])
         testSetPixels.extend(pixels[i:i+100])
 
+    random.shuffle(trainingSetPixels)
     # Initialize and train SOFM
     sofm = SOFM(input_size=784, grid_size=12)
     train_sofm(sofm, trainingSetPixels)
@@ -118,7 +127,8 @@ def runNetwork():
     activity_matrices = test_sofm(sofm, testSetPixels, testSetTargets)
 
     # Plot figures
+    save_weights_to_file(sofm.weights, './HW5_datafiles/sofm_weights.txt')
     plot_heatmaps(activity_matrices)
-    plot_weight_grid(sofm)
+    plot_weight_grids(sofm)
 
-runNetwork()
+    return sofm.weights # return weights to be used in problem 3

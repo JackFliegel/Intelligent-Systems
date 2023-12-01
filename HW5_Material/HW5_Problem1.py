@@ -214,7 +214,7 @@ def runFeedForward():
     train_accuracies, val_accuracies = [], []
     
     # Randomize training data sets
-    # random.shuffle(trainingSet)
+    random.shuffle(trainingSet)
     #Write sets to txt
     writeSet(trainingSet, 'trainingSet.txt')
     writeSet(testSet, 'testSet.txt')
@@ -354,6 +354,3 @@ def runFeedForward():
     layer2Case2.forward(activation1Case2.output)
     activation2Case2.forward(layer2Case2.output)
     plot_confusion_matrix(compute_confusion_matrix(testSetTargets, calculate_predictions(activation2Case2.output)), title='Test Set Case II')
-
-
-runFeedForward()
